@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>xcv outside the world perspective</title>
+    <meta name="theme-color" content="#000000" />
+
+    <style>
+        * {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        img {
+            -webkit-user-drag: none;
+            user-drag: none;
+        }
+
+        html {
+            background: #000;
+        }
+
+        /* у body нет своего фона: иначе чёрный фон закрывает видео */
+        html, body {
+            margin: 0;
+            height: 100%;
+        }
+
+        body {
+            background: transparent;
+        }
+
+        /* одно видео на фоне */
+        #bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #000;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+            box-sizing: border-box;
+        }
+
+        /* единственная кнопка */
+        .btn {
+            display: block;
+        }
+
+        .btn img {
+            display: block;
+            max-width: 60vw;
+            max-height: 60vh;
+            object-fit: contain;
+            cursor: pointer;
+        }
+
+        .btn:hover img {
+            filter: brightness(1.15);
+        }
+
+        #hint {
+            position: fixed;
+            top: calc(12px + env(safe-area-inset-top, 0px));
+            left: 0;
+            right: 0;
+            text-align: center;
+            font: 13px/1.4 sans-serif;
+            color: rgba(255, 255, 255, .6);
+            pointer-events: none;
+            display: none;
+        }
+
+        .note {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+            text-align: center;
+            font: 12px/1.4 sans-serif;
+            color: rgba(255, 255, 255, .45);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <video id="bg" autoplay muted loop playsinline preload="auto">
+        <source src="video/bg.mp4" type="video/mp4">
+    </video>
+
+    <<a class="btn" href="https://dropmefiles.com/1SSRJ" target="_blank" rel="noopener noreferrer">
+        <img src="button.png" alt="Скачать игру" draggable="false" loading="eager" decoding="async" fetchpriority="high">
+    </a>
+
+    <audio id="bg-track" src="music.mp3" autoplay loop playsinline style="display: none;"></audio>
+
+    <script>
+        (function () {
+            // Видео не двигается, если у человека включено «уменьшить движение»
+            var video = document.getElementById('bg');
+            if (video && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                video.pause();
+            }
+
+            var audio = document.getElementById('bg-track');
+            var hint = document.getElementById('hint');
+            if (!audio) return;
+            audio.volume = 0.8;
+
+            // Музыка играет всегда. Браузеры (Chrome, Safari, Firefox) не разрешают звук,
+            // пока человек не сделал хоть что-то на странице, поэтому:
+            // 1) пробуем включить сразу; 2) если не дали, включаем при первом
+            // клике, касании или нажатии клавиши в любом месте страницы.
+            var events = ['pointerdown', 'pointerup', 'mousedown', 'click', 'touchend', 'keydown'];
+
+            function playing() {
+                if (hint) hint.style.display = 'none';
+                events.forEach(function (e) {
+                    document.removeEventListener(e, unlock, true);
+                });
+            }
+
+            function unlock() {
+                audio.play().then(playing).catch(function () {});
+            }
+
+            audio.play().then(playing).catch(function () {
+                if (hint) hint.style.display = 'block';
+                events.forEach(function (e) {
+                    document.addEventListener(e, unlock, true);
+                });
+            });
+
+            // Если музыка остановилась (вкладка уходила в фон, трек закончился), запускаем снова
+            function restart() {
+                audio.play().catch(function () {});
+            }
+            audio.addEventListener('pause', function () {
+                if (!document.hidden) restart();
+            });
+            audio.addEventListener('ended', restart);
+            document.addEventListener('visibilitychange', function () {
+                if (!document.hidden && audio.paused) restart();
+            });
+        })();
+    </script>
+</body>
+</html>
