@@ -23,7 +23,6 @@
             background: #000;
         }
 
-        /* у body нет своего фона: иначе чёрный фон закрывает видео */
         html, body {
             margin: 0;
             height: 100%;
@@ -33,7 +32,6 @@
             background: transparent;
         }
 
-        /* одно видео на фоне */
         #bg {
             position: fixed;
             top: 0;
@@ -54,7 +52,6 @@
             box-sizing: border-box;
         }
 
-        /* единственная кнопка */
         .btn {
             display: block;
         }
@@ -97,10 +94,10 @@
 </head>
 <body>
     <video id="bg" autoplay muted loop playsinline preload="auto">
-        <source src="video/bg.mp4" type="video/mp4">
+        <source src="bg.mp4" type="video/mp4">
     </video>
 
-    <<a class="btn" href="https://dropmefiles.com/1SSRJ" target="_blank" rel="noopener noreferrer">
+    <a class="btn" href="https://dropmefiles.com/1SSRJ" target="_blank" rel="noopener noreferrer">
         <img src="button.png" alt="Скачать игру" draggable="false" loading="eager" decoding="async" fetchpriority="high">
     </a>
 
@@ -108,7 +105,6 @@
 
     <script>
         (function () {
-            // Видео не двигается, если у человека включено «уменьшить движение»
             var video = document.getElementById('bg');
             if (video && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
                 video.pause();
@@ -119,10 +115,6 @@
             if (!audio) return;
             audio.volume = 0.8;
 
-            // Музыка играет всегда. Браузеры (Chrome, Safari, Firefox) не разрешают звук,
-            // пока человек не сделал хоть что-то на странице, поэтому:
-            // 1) пробуем включить сразу; 2) если не дали, включаем при первом
-            // клике, касании или нажатии клавиши в любом месте страницы.
             var events = ['pointerdown', 'pointerup', 'mousedown', 'click', 'touchend', 'keydown'];
 
             function playing() {
@@ -143,7 +135,6 @@
                 });
             });
 
-            // Если музыка остановилась (вкладка уходила в фон, трек закончился), запускаем снова
             function restart() {
                 audio.play().catch(function () {});
             }
